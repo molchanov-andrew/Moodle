@@ -7,7 +7,9 @@
  */
 opcache_reset();
 global $CFG;
-require_once ($CFG->dirroot . '/blocks/user_list/classes/form/UserForm.php');
+require_once($CFG->dirroot . '/blocks/user_list/classes/form/UserForm.php');
+require_once($CFG->dirroot . '/blocks/user_list/classes/models/User.php');
+require_once($CFG->dirroot . '/blocks/user_list/classes/models/UserExpensive.php');
 
 class block_user_list extends block_base
 {
@@ -23,23 +25,24 @@ class block_user_list extends block_base
         $this->version = 2004111200;
     }
 
-    public function html_attributes() {
+    public function html_attributes()
+    {
         $attributes = parent::html_attributes();
         // Append our class to class attribute.
-        $attributes['class'] .= ' block_'. $this->name();
+        $attributes['class'] .= ' block_' . $this->name();
         return $attributes;
     }
 
-    public function get_content() : stdClass
+    public function get_content(): stdClass
     {
         global $OUTPUT;
         if ($this->content !== NULL) {
             return $this->content;
         }
 
-        $this->content = (object) [
-            'items'  => [],
-            'icons'  => [],
+        $this->content = (object)[
+            'items' => [],
+            'icons' => [],
             'footer' => 'Footer here...',
         ];
 
@@ -55,6 +58,15 @@ class block_user_list extends block_base
         } else if ($fromform = $form->get_data()) {
             // When the form is submitted, and the data is successfully validated,
             // the `get_data()` function will return the data posted in the form.
+            $model = new UserExpensive();
+
+            foreach ($fromform->userId as $id) {
+                if ($expensive = $model->getRecord($id)) {
+                    $dataObject = new stdClass();
+                    $dataObject->id = $expensive->id;
+                    $expensive->save($dataObject);
+                }
+            }
         } else {
             // This branch is executed if the form is submitted but the data doesn't
             // validate and the form should be redisplayed or on the first display of the form.

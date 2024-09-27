@@ -1,18 +1,16 @@
 <?php
 
 /**
- * User.php
+ * UserExpensive.php
  * Author: Andrii Molchanov
  * Email: andymolchanov@gmail.com
- * 26.09.2024
+ * 27.09.2024
  */
-
-class User
+class UserExpensive
 {
+    const TABLE_NAME = 'block_user_list_expensive';
 
-    const TABLE_NAME = 'user';
-
-    public function getUserList()
+    public function getRecords()
     {
         global $DB;
         try {
@@ -23,7 +21,7 @@ class User
         }
     }
 
-    public function getUser($id)
+    public function getRecord($id)
     {
         global $DB;
         try {
@@ -34,15 +32,14 @@ class User
         }
     }
 
-//    public function save()
-//    {
-//        global $DB;
-//        try {
-//            return $DB->update_record('user', ['id' => $id]);
-//        } catch (dml_exception $e) {
-//// Do something
-//            return $e->getMessage();
-//        }
-//    }
-
+    public function save($dataObject)
+    {
+        global $DB;
+        try {
+            return $DB->update_record(self::TABLE_NAME, $dataObject);
+        } catch (dml_exception $e) {
+// Do something
+            return $e->getMessage();
+        }
+    }
 }

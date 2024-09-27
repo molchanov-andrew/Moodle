@@ -16,7 +16,6 @@ class UserForm extends moodleform
     // Add elements to form.
     public function definition()
     {
-        global $CFG;
         $model = new User();
         $userList = $model->getUserList();
         // A reference to the form is stored in $this->form.
@@ -25,9 +24,8 @@ class UserForm extends moodleform
 
 
         foreach ($userList as $user) {
-
             // Add elements to your form.
-            $mform->addElement('hidden', 'user_'. $user->id .'_id', $user->id);
+            $mform->addElement('hidden', 'user_id['. $user->id .']' , $user->id);
             $mform->addElement('text', 'estimate_' . $user->id, get_string('estimate'));
             $mform->addElement('text', 'username_' . $user->id, get_string('username'));
             $mform->addElement('text', 'email_' . $user->id, get_string('email'));
