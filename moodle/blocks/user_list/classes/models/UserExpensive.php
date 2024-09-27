@@ -25,18 +25,25 @@ class UserExpensive
     {
         global $DB;
         try {
-            return $DB->get_records(self::TABLE_NAME, ['id' => $id]);
+            return $DB->get_record(self::TABLE_NAME, ['id' => $id]);
         } catch (dml_exception $e) {
 // Do something
-            return $e->getMessage();
+            return $e;
         }
     }
 
-    public function save($dataObject)
+    public function save($dataObject, $id)
     {
         global $DB;
         try {
-            return $DB->update_record(self::TABLE_NAME, $dataObject);
+
+            if($DB->record_exists(self::TABLE_NAME, ['id' => $id]))
+            {
+                $DB->update_record(self::TABLE_NAME, $dataObject);
+            } else {
+                $DB->insert_record(self::TABLE_NAME, $dataObject);
+            }
+
         } catch (dml_exception $e) {
 // Do something
             return $e->getMessage();

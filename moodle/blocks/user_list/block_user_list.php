@@ -55,24 +55,31 @@ class block_user_list extends block_base
             // If there is a cancel element on the form, and it was pressed,
             // then the `is_cancelled()` function will return true.
             // You can handle the cancel operation here.
-        } else if ($fromform = $form->get_data()) {
-            // When the form is submitted, and the data is successfully validated,
-            // the `get_data()` function will return the data posted in the form.
-            $model = new UserExpensive();
-
-            foreach ($fromform->userId as $id) {
-                if ($expensive = $model->getRecord($id)) {
-                    $dataObject = new stdClass();
-                    $dataObject->id = $expensive->id;
-                    $expensive->save($dataObject);
-                }
-            }
         } else {
-            // This branch is executed if the form is submitted but the data doesn't
-            // validate and the form should be redisplayed or on the first display of the form.
+            if ($fromform = $form->get_data()) {
+                // When the form is submitted, and the data is successfully validated,
+                // the `get_data()` function will return the data posted in the form.
+                $model = new UserExpensive();
 
-            // Set anydefault data (if any).
-            $form->set_data($toform);
+                foreach ($fromform->user_id as $id) {
+                    $dataObject = new stdClass();
+                    if ((bool)(($estimate = $model->getRecord($id)))) {
+                        $dataObject->id = $estimate->id;
+                        $dataObject->user_expensive = ($estimate->user_estimate)??$fromform->estimate[$id];
+                    } else {
+                        $dataObject->user_expensive = $fromform->estimate[$id];
+                        $dataObject->user_id = $id;
+                    }
+                    $model->save($dataObject, $id);
+
+                }
+            } else {
+                // This branch is executed if the form is submitted but the data doesn't
+                // validate and the form should be redisplayed or on the first display of the form.
+
+                // Set anydefault data (if any).
+                $form->set_data($toform);
+            }
         }
 
         $this->content->text = $form->render();
